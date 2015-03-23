@@ -510,14 +510,14 @@ class PerformanceTracker(object):
         # we already store perf periods as attributes
         del state_dict['perf_periods']
 
-        STATE_VERSION = 2
+        STATE_VERSION = 3
         state_dict[VERSION_LABEL] = STATE_VERSION
 
         return state_dict
 
     def __setstate__(self, state):
 
-        OLDEST_SUPPORTED_STATE = 1
+        OLDEST_SUPPORTED_STATE = 3
         version = state.pop(VERSION_LABEL)
 
         if version < OLDEST_SUPPORTED_STATE:
@@ -527,13 +527,6 @@ class PerformanceTracker(object):
 
         # Handle the dividend frame specially
         self.dividend_frame = pickle.loads(state['dividend_frame'])
-
-        if version == 1:
-            # V1 had PositionTracker duties on Period.
-            # default to grabbing the position_tracker from cumulatve
-            assert 'position_tracker' not in state
-            position_tracker = self.cumulative_performance.position_tracker
-            self.position_tracker = position_tracker
 
         # properly setup the perf periods
         self.perf_periods = []
